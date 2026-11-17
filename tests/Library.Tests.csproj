@@ -1,0 +1,31 @@
+<!-- Factory-owned file: agents must not edit it. Test dependencies are added by the factory
+     (its scripts/AddDependency tool, test scope) at exact versions. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Trysac.UnityDialogueSystem.Tests</AssemblyName>
+    <RootNamespace>Trysac.UnityDialogueSystem.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- Test classes and methods are not public API: no XML documentation required. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageReference Include="FsCheck.Xunit" Version="3.6.0" />
+    <PackageReference Include="coverlet.collector" Version="10.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../src/Library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Fixtures and golden files, copied next to the test assembly (read them from AppContext.BaseDirectory). -->
+    <None Include="fixtures/**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

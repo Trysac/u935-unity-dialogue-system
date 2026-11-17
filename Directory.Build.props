@@ -1,0 +1,26 @@
+<!-- Factory-owned file: agents must not edit it. Shared build settings of every project in this repository
+     (the library, its tests and the factory scripts): the quality contract of the compiler and analyzers. -->
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Lint: the .NET analyzers at the latest recommended set and the code-style rules of .editorconfig, every
+         warning an error. -->
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
+    <!-- Reproducible restores: each project commits its packages.lock.json and the gates restore with
+         locked mode. Advisories are checked by the audit and osv gates, not during restore (offline-safe). -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+  <!-- The gates image sets FABRICA_BUILD_DIR: bin/ and obj/ move out of the mounted repository. -->
+  <PropertyGroup Condition="'$(FABRICA_BUILD_DIR)' != ''">
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(FABRICA_BUILD_DIR)</ArtifactsPath>
+  </PropertyGroup>
+</Project>

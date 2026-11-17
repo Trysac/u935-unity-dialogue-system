@@ -1,0 +1,1 @@
+{"lang": "csharp", "package": "Trysac.UnityDialogueSystem", "commands": {"install": [["dotnet", "restore", "Library.sln", "--locked-mode"]], "check": [["dotnet", "run", "--project", "scripts/Check", "--"]]}}

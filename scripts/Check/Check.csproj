@@ -1,0 +1,9 @@
+<!-- Factory-owned file: agents must not edit it. The gate runner of this repository. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,24 @@
+<!-- Factory-owned file: agents must not edit it. Dependencies are added by the factory
+     (its scripts/AddDependency tool) at exact versions; shared settings live in
+     Directory.Build.props. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Trysac.UnityDialogueSystem</AssemblyName>
+    <RootNamespace>Trysac.UnityDialogueSystem</RootNamespace>
+    <PackageId>Trysac.UnityDialogueSystem</PackageId>
+    <Version>0.1.0</Version>
+    <Description>Run branching game dialogues from JSON graphs with typed variables, a bounded condition language, assignment nodes and localized lines with locale fallback</Description>
+    <Authors>Miguel Gomez</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Trysac/u935-unity-dialogue-system</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Trysac/u935-unity-dialogue-system</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

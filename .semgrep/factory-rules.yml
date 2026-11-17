@@ -1,0 +1,65 @@
+# Semgrep CE rules owned by the factory (MIT, like this repository). The semgrep gate in scripts/Check runs only
+# this file; Semgrep-maintained registry rules are never used (their license forbids distribution and service use).
+# Every rule is ERROR: a match fails the gate. Factory-owned file: agents must not edit it.
+rules:
+  - id: fabrica.csharp.exec-through-shell
+    languages: [csharp]
+    severity: ERROR
+    message: Running a command through a shell (sh -c, bash -c, cmd /c, PowerShell) or with UseShellExecute allows command injection. Start the program itself with ProcessStartInfo.ArgumentList and pass each argument separately.
+    pattern-either:
+      - pattern: Process.Start("sh", ...)
+      - pattern: Process.Start("/bin/sh", ...)
+      - pattern: Process.Start("bash", ...)
+      - pattern: Process.Start("/bin/bash", ...)
+      - pattern: Process.Start("cmd", ...)
+      - pattern: Process.Start("cmd.exe", ...)
+      - pattern: Process.Start("powershell", ...)
+      - pattern: Process.Start("pwsh", ...)
+      - pattern: new ProcessStartInfo("sh", ...)
+      - pattern: new ProcessStartInfo("/bin/sh", ...)
+      - pattern: new ProcessStartInfo("bash", ...)
+      - pattern: new ProcessStartInfo("cmd", ...)
+      - pattern: new ProcessStartInfo("cmd.exe", ...)
+      - pattern: new ProcessStartInfo("powershell", ...)
+      - pattern-regex: \bFileName\s*=\s*"(?:/bin/)?(?:sh|bash|cmd(?:\.exe)?|powershell|pwsh)"
+      - pattern-regex: \bUseShellExecute\s*=\s*true\b
+  - id: fabrica.csharp.insecure-deserialization
+    languages: [csharp]
+    severity: ERROR
+    message: BinaryFormatter and its relatives (SoapFormatter, NetDataContractSerializer, LosFormatter, ObjectStateFormatter) or Json.NET type name handling deserialize arbitrary types, so untrusted bytes can run code. Use System.Text.Json with explicit types instead.
+    pattern-either:
+      - pattern: new BinaryFormatter(...)
+      - pattern: new SoapFormatter(...)
+      - pattern: new NetDataContractSerializer(...)
+      - pattern: new LosFormatter(...)
+      - pattern: new ObjectStateFormatter(...)
+      - pattern-regex: \bTypeNameHandling\s*=\s*TypeNameHandling\.(?:All|Auto|Objects|Arrays)\b
+  - id: fabrica.csharp.tls-verification-disabled
+    languages: [csharp]
+    severity: ERROR
+    message: TLS certificate validation is disabled (a validation callback that accepts every certificate), so any server can impersonate the real one.
+    pattern-either:
+      - pattern: HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+      - pattern: $H.ServerCertificateCustomValidationCallback = ($A, $B, $C, $D) => true
+      - pattern: ServicePointManager.ServerCertificateValidationCallback = ($A, $B, $C, $D) => true
+      - pattern: ServicePointManager.ServerCertificateValidationCallback += ($A, $B, $C, $D) => true
+      - pattern: $O.RemoteCertificateValidationCallback = ($A, $B, $C, $D) => true
+  - id: fabrica.csharp.dynamic-code
+    languages: [csharp]
+    severity: ERROR
+    message: Compiling or evaluating a string as code (Roslyn scripting, CSharpCodeProvider) runs whatever the input says. Interpret the input explicitly instead.
+    pattern-either:
+      - pattern: CSharpScript.EvaluateAsync(...)
+      - pattern: CSharpScript.RunAsync(...)
+      - pattern: CSharpScript.Create(...)
+      - pattern: new CSharpCodeProvider(...)
+  - id: fabrica.csharp.hardcoded-secret
+    languages: [csharp]
+    severity: ERROR
+    message: A credential (private key, AKIA access key, GitHub, Slack or Stripe token) is hard-coded in the source. Read it from the environment.
+    pattern-either:
+      - pattern-regex: -----BEGIN (RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----
+      - pattern-regex: \b(AKIA|ASIA)[0-9A-Z]{16}\b
+      - pattern-regex: \bgh[pousr]_[A-Za-z0-9]{36}\b
+      - pattern-regex: \bxox[baprs]-[A-Za-z0-9-]{10,}\b
+      - pattern-regex: \bsk_live_[A-Za-z0-9]{24,}\b

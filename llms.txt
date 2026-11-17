@@ -1,0 +1,16 @@
+# unity-dialogue-system
+
+> Run branching game dialogues from JSON graphs with typed variables, a bounded condition language, assignment nodes and localized lines with locale fallback NuGet package `Trysac.UnityDialogueSystem`, namespace `Trysac.UnityDialogueSystem`, MIT
+> licensed, .NET >= 10, base class library only.
+
+## Docs
+
+- [README](README.md): problem, install, usage example
+- [AGENTS](AGENTS.md): commands, folder map, conventions, limits
+- [Architecture](docs/ARCHITECTURE.md): shape of the library and its public API
+- [Testing](docs/TESTING.md): how to run and extend the tests
+
+## Optional
+
+- [Stack](docs/STACK.md): tools used and discarded
+- [Changelog](CHANGELOG.md): release history

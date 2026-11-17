@@ -1,0 +1,50 @@
+# Factory-owned file: agents must not edit it. Layout and code style of this repository; `dotnet format`
+# applies it and the build enforces the rules marked as warnings (EnforceCodeStyleInBuild, warnings are errors).
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{csproj,props,targets,json,yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# Layout
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+dotnet_sort_system_directives_first = true
+
+# Style, enforced in the build
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_readonly_field = true:warning
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+dotnet_diagnostic.IDE0005.severity = warning # unnecessary using directives
+dotnet_diagnostic.IDE0011.severity = warning # braces
+dotnet_diagnostic.IDE0161.severity = warning # file-scoped namespaces
+dotnet_diagnostic.IDE0055.severity = warning # formatting
+
+# Naming: PascalCase types and members.
+dotnet_naming_rule.public_members.symbols = public_members
+dotnet_naming_rule.public_members.style = pascal
+dotnet_naming_rule.public_members.severity = warning
+dotnet_naming_symbols.public_members.applicable_kinds = class, struct, interface, enum, method, property, event, delegate
+dotnet_naming_symbols.public_members.applicable_accessibilities = public, protected, internal
+dotnet_naming_style.pascal.capitalization = pascal_case

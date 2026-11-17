@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# Test results and coverage
+TestResults/
+coverage/
+*.cobertura.xml
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# Local environment
+.env
+.env.*
+!.env.example
