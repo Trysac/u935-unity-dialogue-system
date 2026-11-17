@@ -1,27 +1,10 @@
-# Security notes
+# Security & Threat Model
 
-## Threat model
+Dialogue files and localization tables may originate from external assets. The library mitigates risks as follows:
 
-`Trysac.UnityDialogueSystem` is a pure library without I/O. The main risks are:
-
-- **Supply chain**: a compromised NuGet package, SDK or CI action. Mitigation: base class library
-  only, every package pinned to an exact version with a committed `packages.lock.json` restored in
-  locked mode, `dotnet list package --vulnerable` (the NuGet advisory database) and OSV-Scanner over
-  the lock files in the gates, Dependabot weekly updates, actions pinned by commit SHA, minimal
-  workflow permissions, the SDK pinned in `global.json`.
-- **Leaked secrets**: tokens committed by mistake. Mitigation: `gitleaks` runs in the local gates
-  and in CI; `.env` files are git-ignored.
-- **Insecure code**: command injection, unsafe deserialization, disabled TLS validation.
-  Mitigation: the .NET analyzers (`latest-recommended`, including the security rules) and nullable
-  warnings as errors, and the factory's Semgrep rules (`.semgrep/factory-rules.yml`, `nosemgrep`
-  ignored); fix the code instead of silencing it.
-- **Untrusted input**: callers may pass hostile strings. Mitigation: validate input and throw
-  explicit, documented exceptions; never deserialize untrusted bytes with `BinaryFormatter`;
-  never start a shell with untrusted data.
-
-## Publishing
-
-Releases are git tags; publishing to nuget.org needs an account and an API key, which are never
-stored in the repository.
-
-To report a vulnerability, see [SECURITY.md](../SECURITY.md).
+- **Input Size Caps**: `DialogueGraph.Load` rejects JSON payloads over `MaxJsonBytes` (default 1 MiB), graphs with more than `MaxNodes` (10,000), choice nodes with more than `MaxOptionsPerChoice` (32), and expressions longer than `MaxExpressionLength` (1,000 characters) with `DialogueException` (`Code = "input_too_large"`).
+- **Stack Overflow Protection**: The recursive-descent expression parser tracks AST depth and rejects expressions nested deeper than `MaxExpressionDepth` (32 levels) with `Code = "too_deep"`.
+- **Infinite Loop Protection**: `DialogueRunner` caps consecutive non-interactive (`set` and `branch`) node transitions at `MaxLoopSteps` (1,000) and throws `Code = "loop_limit"`.
+- **Arithmetic Safety**: `int` operations use checked arithmetic; overflows throw `Code = "overflow"`, division/modulo by zero throw `Code = "division_by_zero"`.
+- **No Dynamic Code**: The expression engine uses a fixed AST and static type-checking.
+- **Safe Error Messages**: `DialogueException` messages are truncated to 200 characters.

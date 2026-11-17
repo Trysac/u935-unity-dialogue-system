@@ -3,28 +3,43 @@ using FsCheck.Xunit;
 
 namespace Trysac.UnityDialogueSystem.Tests;
 
-/// <summary>Property tests (FsCheck) of the invariants of <see cref="Text.Normalize"/>.</summary>
+/// <summary>
+/// Property-based tests for text normalization, expressions, and localization.
+/// </summary>
 public class TextPropertiesTests
 {
     [Property]
-    public bool NormalizingTwiceChangesNothing(NonNull<string> input)
+    public bool NormalizedTextIsTrimmedAndLowercase(NonEmptyString raw)
     {
-        if (string.IsNullOrWhiteSpace(input.Get))
+        var s = raw.Get;
+        if (string.IsNullOrWhiteSpace(s))
         {
             return true;
         }
-        var once = Text.Normalize(input.Get);
-        return once == Text.Normalize(once);
+
+        var normalized = Text.Normalize(s);
+        return string.Equals(normalized, normalized.Trim(), StringComparison.Ordinal) &&
+               string.Equals(normalized, normalized.ToLowerInvariant(), StringComparison.Ordinal);
     }
 
     [Property]
-    public bool OutputHasNoSurroundingWhitespace(NonNull<string> input)
+    public bool IntegerAdditionCommutesInConditions(short a, short b)
     {
-        if (string.IsNullOrWhiteSpace(input.Get))
-        {
-            return true;
-        }
-        var output = Text.Normalize(input.Get);
-        return output == output.Trim();
+        var vars = new VariableStore()
+            .Declare("a", a)
+            .Declare("b", b);
+
+        return Condition.Evaluate("a + b == b + a", vars);
+    }
+
+    [Property]
+    public bool MissingLocalizationKeyAlwaysRendersBracketed(NonEmptyString rawKey)
+    {
+        var key = rawKey.Get;
+        var localizer = new Localizer(
+            new Dictionary<string, IReadOnlyDictionary<string, string>>(),
+            "en");
+        var vars = new VariableStore();
+        return localizer.Text(key, vars) == $"[{key}]";
     }
 }

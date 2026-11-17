@@ -1,45 +1,35 @@
-# unity-dialogue-system
+# Trysac.UnityDialogueSystem
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/Trysac/u935-unity-dialogue-system/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u935-unity-dialogue-system/actions/workflows/ci.yml)
+Engine-independent branching game dialogue runtime for Unity and .NET. Loads JSON dialogue graphs with typed variables (`int`, `bool`, `string`), validates every node reference and expression at load time, evaluates bounded conditions and assignments, and resolves localized text with locale fallback and placeholder interpolation.
 
-Run branching game dialogues from JSON graphs with typed variables, a bounded condition language, assignment nodes and localized lines with locale fallback
+## Why versus Ink or Yarn Spinner
 
-## Problem
-
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
-
-## Install
-
-NuGet package `Trysac.UnityDialogueSystem`. Until it is published to nuget.org, build it from a release
-tag with `dotnet pack src/Library.csproj`, then reference the package:
-
-```xml
-<PackageReference Include="Trysac.UnityDialogueSystem" Version="0.1.0" />
-```
-
-Requires .NET 10 or newer. No dependencies outside the base class library.
+- **Zero custom compiler step**: Dialogue graphs are plain JSON validated in memory when loaded.
+- **Static type-checking at load**: Typos in node IDs, undeclared variable names, or comparing an `int` with a `bool` throw `DialogueException` during `DialogueGraph.Load` before play starts.
+- **Bounded execution**: Enforces configurable caps on JSON payload size (1 MiB), node count (10,000), options per choice (32), expression length (1,000 chars), AST depth (32), and non-interactive node loops (1,000 steps).
 
 ## Usage
 
 ```csharp
 using Trysac.UnityDialogueSystem;
 
-// Normalize trims surrounding whitespace and lower-cases the text.
-var name = Text.Normalize("  Hello World "); // "hello world"
-
-// Blank input is rejected explicitly instead of returning an empty string.
-Text.Normalize("   "); // throws BlankInputException ("input is blank")
+var graph = DialogueGraph.Load(File.ReadAllText("tests/fixtures/guard.json"));
+var vars = new VariableStore(graph);
+vars.Set("gold", 25);
+var tables = new Dictionary<string, IReadOnlyDictionary<string, string>> {
+    ["en"] = new Dictionary<string, string> { ["guard.halt"] = "Halt! The toll is 10 gold.", ["choice.pay"] = "Pay" }
+};
+var runner = new DialogueRunner(graph, vars, new Localizer(tables, "en"));
+DialogueStep step = runner.Start();
 ```
 
-## Documentation
+## Public API Summary
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
+- **`DialogueGraph`**: Loads and validates JSON graphs. Properties: `IReadOnlyList<string> NodeIds`, `string StartNode`.
+- **`DialogueRunner`**: Executes dialogue steps via `Start`, `Advance`, `Choose`, `State`, and `Restore`.
+- **`DialogueStep`**: Data record for steps (`Line`, `Choice`, `End`).
+- **`VariableStore`**: Typed storage (`int`, `bool`, `string`) for conversation state.
+- **`Localizer`**: Handles translation tables and variable interpolation.
+- **Errors**: All operations may throw `DialogueException` with codes like `unknown_node`, `invalid_expression`, `unknown_variable`, `type_mismatch`, `loop_limit`, `input_too_large`, `too_deep`, `invalid_choice`, `finished`, `invalid_graph`, `duplicate_node`, `overflow`, or `division_by_zero`.
 
-## License
-
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+See [docs/SECURITY.md](docs/SECURITY.md) for threat modeling and resource limits.
