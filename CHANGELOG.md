@@ -9,4 +9,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Added `DialogueGraph`, `DialogueRunner`, `DialogueStep`, `VariableStore`, `Condition`, `Localizer`, `RunnerState`, `DialogueLimits`, and `DialogueException` for loading, validating, localizing, and running branching JSON dialogues.
 - Initial project structure from the factory utility template.
